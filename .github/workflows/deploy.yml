@@ -1,0 +1,66 @@
+name: Build and Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ master ]  # 只在 master 分支推送时触发
+  pull_request:          # 在 PR 时只运行构建（不部署）
+    branches: [ master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest  # 使用 GitHub 托管的 Ubuntu 环境
+    
+    steps:
+    # 步骤 1: 检出代码库
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    # 步骤 2: 设置 Node.js 环境
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'  # 使用 Node.js 20
+        cache: 'npm'         # 缓存 npm 依赖加速后续构建
+    
+    # 步骤 3: 安装依赖
+    - name: Install dependencies
+      run: npm ci            # 使用 ci 命令确保依赖一致性
+    
+    # 步骤 4: 代码检查（可选，不阻塞流程）
+    - name: Run linter
+      run: |
+        if [ -f "node_modules/.bin/eslint" ]; then
+          npx eslint . || echo "Linting issues found"
+        else
+          echo "No linter found, skipping"
+        fi
+    
+    # 步骤 5: 构建项目
+    - name: Build project
+      run: npm run build     # 运行 package.json 中的 build 脚本
+    
+    # 步骤 6: 验证构建输出
+    - name: Verify build output
+      run: |
+        # 检查 dist 目录是否存在且包含 index.html
+        if [ ! -d "dist" ]; then
+          echo "❌ Error: dist directory not found after build!"
+          exit 1
+        fi
+        
+        if [ ! -f "dist/index.html" ]; then
+          echo "❌ Error: index.html not found in dist directory!"
+          exit 1
+        fi
+        
+        echo "✅ Build output verified successfully"
+    
+    # 步骤 7: 部署到 GitHub Pages
+    - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/master'  # 只在 master 分支部署
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}  # GitHub 自动提供的 token
+        publish_dir: ./dist                         # 构建输出的目录
+        publish_branch: gh-pages                    # 部署到的分支
+        keep_files: false                           # 清除旧文件
