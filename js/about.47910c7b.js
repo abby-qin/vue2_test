@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkmy_vue2_project"]=self["webpackChunkmy_vue2_project"]||[]).push([[594],{69220:function(t,u,e){e.r(u),e.d(u,{default:function(){return l}});var n=function(){var t=this;t._self._c;return t._m(0)},s=[function(){var t=this,u=t._self._c;return u("div",{staticClass:"about"},[u("h1",[t._v("This is an about page")])])}],r=e(81656),a={},c=(0,r.A)(a,n,s,!1,null,null,null),l=c.exports}}]);
+//# sourceMappingURL=about.47910c7b.js.map
