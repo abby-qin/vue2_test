@@ -1,38 +1,42 @@
-name: Deploy to Server
+name: Deploy to Huawei Cloud
 
 on:
   push:
-    branches: [ master ]  # 只在master分支推送时触发
+    branches: [ master ]  # 触发分支
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      
-    - name: Install Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
-        
-    - name: Install dependencies
-      run: npm install
-      
-    - name: Build project
-      run: npm run build  # 如果你的项目需要构建
-      
-    - name: Deploy to Server
-      uses: appleboy/ssh-action@v0.1.10
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER }}
-        port: ${{ secrets.SERVER_PORT }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        script: |
-          source ~/.bashrc  # 加载环境变量
-          cd ${{ secrets.PROJECT_PATH }}
-          git pull origin master
-          npm install --production
-          pm2 restart all  # 如果你使用pm2管理进程
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Node.js (示例)
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          port: ${{ secrets.SERVER_PORT }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            # 进入项目目录
+            cd ${{ secrets.PROJECT_PATH }} || mkdir -p ${{ secrets.PROJECT_PATH }} && cd ${{ secrets.PROJECT_PATH }}
+            
+            # 克隆或更新代码
+            if [ ! -d .git ]; then
+              git clone https://github.com/你的用户名/仓库名.git .
+            else
+              git pull origin master
+            fi
+
+            # 安装依赖（示例）
+            npm install --omit=dev
+            npm run build  # 若需构建
+
+            # 重启服务（如 PM2）
+            pm2 restart all
