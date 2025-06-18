@@ -35,7 +35,7 @@ jobs:
             fi
 
             # 安装依赖（示例）
-            npm install --omit=dev
+            npm install --legacy-peer-deps
             npm run build  # 若需构建
 
             # 重启服务（如 PM2）
