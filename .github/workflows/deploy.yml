@@ -29,7 +29,7 @@ jobs:
             
             # 克隆或更新代码
             if [ ! -d .git ]; then
-              git clone https://github.com/你的用户名/仓库名.git .
+              git clone https://github.com/abby-qin/vue2_test.git .
             else
               git pull origin master
             fi
