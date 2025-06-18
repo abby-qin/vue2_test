@@ -31,6 +31,7 @@ jobs:
         port: ${{ secrets.SERVER_PORT }}
         key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
+          source ~/.bashrc  # 加载环境变量
           cd ${{ secrets.PROJECT_PATH }}
           git pull origin master
           npm install --production
