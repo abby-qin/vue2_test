@@ -38,10 +38,13 @@ jobs:
             npm install --legacy-peer-deps
             npm run build  # 若需构建
 
-            # 启动PM2服务（关键修改）
-            pm2 delete vue2-app || true  # 删除旧进程（如果存在）
-            pm2 serve dist 8080 --name "vue2-app" --spa  # 直接托管dist目录
+            # 优化PM2启动流程
+            pm2 describe vue2-app > /dev/null 2>&1
+            if [ $? -eq 0 ]; then
+              pm2 reload vue2-app --update-env
+            else
+              pm2 serve dist 8080 --name "vue2-app" --spa
+            fi
             
-            # 保存PM2配置
-            pm2 save
-            pm2 startup  # 如果需要开机自启
+            # 确保PM2配置持久化
+            pm2 save && pm2 list
